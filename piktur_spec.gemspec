@@ -2,7 +2,7 @@
 
 $LOAD_PATH.push File.expand_path('./lib', __dir__)
 
-require_relative 'lib/piktur/spec/version.rb'
+require_relative './lib/piktur/spec/version.rb'
 
 Gem::Specification.new do |s|
   s.name        = 'piktur_spec'
@@ -16,6 +16,9 @@ Gem::Specification.new do |s|
   s.license = ''
   s.files = Dir[
     '{bin,config,lib}/**/*.rb',
+    'Gemfile',
+    'Gemfile.common',
+    'Gemfile.dummy',
     'piktur_spec.gemspec'
   ]
   s.require_paths = %w(lib)
@@ -28,7 +31,6 @@ Gem::Specification.new do |s|
   s.add_dependency 'amoeba',                            '~> 3.1'
   s.add_dependency 'aruba',                             '~> 0.14'
   s.add_dependency 'better_errors',                     '~> 2.1'
-  s.add_dependency 'bullet',                            '~> 5.1'
   s.add_dependency 'capybara',                          '~> 2.7'
   s.add_dependency 'database_cleaner',                  '~> 1.5'
   s.add_dependency 'factory_bot_rails',                 '~> 4.8'
@@ -38,8 +40,7 @@ Gem::Specification.new do |s|
   s.add_dependency 'rspec-rails',                       '~> 3.7'
   s.add_dependency 'shoulda-matchers',                  '~> 3.1'
   s.add_dependency 'simplecov',                         '~> 0.12'
-  s.add_dependency 'spring',                            '~> 1.7'
-  s.add_dependency 'spring-commands-rspec',             '~> 1.0'
+  s.add_dependency 'spring',                            '~> 2.0'
   s.add_dependency 'spring-watcher-listen',             '~> 2.0'
 
   # s.add_dependency 'byebug',                            '~> 9.0'

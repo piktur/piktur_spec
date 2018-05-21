@@ -1,47 +1,28 @@
 # frozen_string_literal: true
 
-load Gem.bin_path('piktur', 'piktur-env')
-
-unless ENV['BUNDLE_GEMFILE']
-  begin
-    require 'bundler/inline'
-  rescue LoadError => err
-    $stderr.puts 'Bundler version 1.10 or later is required. Please update your Bundler'
-    raise err
-  end
-
-  # @note you can add common dependencies to the existing Gemfile aswell
-  # if ENV.key?('BUNDLE_GEMFILE')
-  #   eval_gemfile(ENV['BUNDLE_GEMFILE'])
-  # else
-  #   gemfile(false) do
-  #     gem 'dependency'
-  #   end
-  # end
-  gemfile(false) do
-    gh = 'https://github.com'
-    bb = 'https://bitbucket.org'
-
-    source ENV['GEM_SOURCE']
-
-    ruby ENV.fetch('RUBY_VERSION').sub('ruby-', '')
-
-    core = Gem.loaded_specs['piktur_core']
-    require_relative File.join(core.gem_dir, 'lib/piktur/core/version.rb')
-
-    gem 'pg'
-
-    gem 'rails',                    Piktur::Core.rails_version, require: false
-
-    gem 'activemodel',              Piktur::Core.rails_version, require: false
-    gem 'activejob',                Piktur::Core.rails_version, require: false
-    gem 'activerecord',             Piktur::Core.rails_version, require: false
-    gem 'actionmailer',             Piktur::Core.rails_version, require: false
-    gem 'actionpack',               Piktur::Core.rails_version, require: false
-    gem 'actioncable',              Piktur::Core.rails_version, require: false
-    gem 'activesupport',            Piktur::Core.rails_version, require: false
-  end
+begin
+  load Gem.bin_path('piktur', 'env')
+rescue Gem::Exception => err
+  require 'pry'
+  binding.pry
+  load File.join(ENV.fetch('PIKTUR_HOME'), 'piktur/bin/env')
 end
+
+# require 'bundler/inline'
+
+# gemfile(true) do
+#   gh = 'https://github.com'
+#   bb = 'https://bitbucket.org'
+
+#   source ENV['GEM_SOURCE']
+
+#   ruby ENV.fetch('RUBY_VERSION').sub('ruby-', '')
+
+#   gem 'piktur_core', git:    "#{bb}/piktur/piktur_core.git",
+#                      branch: 'rom'
+# end
+
+# require 'piktur_core'
 
 %w(rails active_record/railtie action_controller/railtie).each { |f| require f }
 
@@ -66,10 +47,6 @@ module Piktur::Spec
                 after: :set_clear_dependencies_hook,
                 group: :all do
       # Perform final setup after absolute last in `Dummy::Application.initializers_chain`
-    end
-
-    routes.draw do
-      #  mount Piktur::Engine => '/'
     end
 
   end

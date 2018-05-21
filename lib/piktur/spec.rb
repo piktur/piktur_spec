@@ -11,18 +11,19 @@ module Piktur
 
     autoload :Ext
     autoload :Config
+    autoload :Helpers
 
     # @return [void]
     def self.define_test_application!
-      require_relative File.expand_path('../../config/application.rb', __dir__)
       yield if block_given?
+      load File.expand_path('../../config/application.rb', __dir__)
     end
 
     # Initializes the Rails application defined at config/application.rb
     # @return [void]
     def self.init_test_application!
-      require_relative File.expand_path('../../config/environment.rb', __dir__)
       yield if block_given?
+      load File.expand_path('../../config/environment.rb', __dir__)
     end
 
     # @example
@@ -47,5 +48,9 @@ module Piktur
     end
 
   end
+
+  # @!method spec
+  #   @see Piktur::Spec::Config
+  Config.setting :spec, Spec::Config, reader: true
 
 end

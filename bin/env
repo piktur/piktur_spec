@@ -1,4 +1,8 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
-load Gem.bin_path('piktur', 'piktur-env')
+begin
+  load Gem.bin_path('piktur', 'env')
+rescue Gem::GemNotFoundException
+  load File.join(ENV.fetch('PIKTUR_HOME'), 'piktur/bin/env')
+end

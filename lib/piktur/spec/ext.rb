@@ -30,9 +30,10 @@ module Piktur
       # @param [String] app limit search to current `app` directory
       # @return [Boolean]
       def require_support(*paths, app: ::Rails.application.railtie_name)
-        regex = ::Regexp.union(paths)
+        app = Pathname.pwd.basename.to_s if app['spec']
         ::Piktur::Spec::Config.support[app]
-          .each { |f| require_relative(f) if f.match?(regex) }
+          .grep(::Regexp.union(paths))
+          .each { |f| require_relative Pathname.pwd.join(f) }
       end
       alias require_shared_examples require_support
 

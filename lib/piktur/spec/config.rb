@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'piktur'
+
 module Piktur
 
   module Spec
@@ -13,7 +15,7 @@ module Piktur
       setting :dirs, {}, { reader: true } do |input|
         {}.tap do |obj|
           input.each do |k, v|
-            next unless (railtie = ::Inflector.constantize(v, ::Piktur))
+            next unless (railtie = Support::Inflector.constantize(v, ::Piktur))
             obj[k] = railtie.root.join('spec')
           end
         end
@@ -27,7 +29,7 @@ module Piktur
           input.each do |e|
             next unless ::Gem.loaded_specs.key?(e = e.to_s)
             obj[e] = ::Gem.loaded_specs[e].test_files
-              .select { |f| f.match?(/\A(spec|test)\/support/) }
+              .select { |f| f.match?(/(spec|test)\/support/) }
           end
         end
       end

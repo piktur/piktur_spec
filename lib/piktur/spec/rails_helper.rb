@@ -1,19 +1,14 @@
 # frozen_string_literal: true
 
-# Ensure correct environment set
-ENV['RAILS_ENV'] = 'test'
-
 require_relative './spec_helper'
 
+require_relative File.join(Object.const_get(:APP_ROOT), 'config/environment.rb')
+
 # Prevent database truncation if the environment is production
-abort('The Rails environment is running in production mode!') if ::Piktur.env.production?
+abort('The Rails environment is running in production mode!') if Piktur.env.production?
 
-# Add additional global requires below this line.
 require 'rspec/rails'
-
-# Don't init coverage from shared helper. Let the requirer decide when to boot coverage
-# reporting.
-# Piktur::Spec.init_coverage_reporting!
+# Add additional requires below this line. Rails is not loaded until this point!
 
 RSpec::Expectations.configuration.on_potential_false_positives = :nothing
 
@@ -22,6 +17,7 @@ RSpec::Expectations.configuration.on_potential_false_positives = :nothing
 # `ActiveRecord::Migration.maintain_test_schema!` drops the database before each run. This is
 # rather inefficient, instead call `Rails.application.load_seed` in before hook when necessary
 # @see Piktur::Spec::Helpers::Database
+
 RSpec.configure do |c|
   c.fixture_path = "#{::Rails.root}/spec/fixtures"
 
@@ -61,19 +57,8 @@ RSpec.configure do |c|
   # @example
   #   c.before(:suite) { DatabaseCleaner.start }
   #   c.after(:suite)  { DatabaseCleaner.clean }
-  c.before(:all) do
-    DatabaseCleaner.start
-
-    unless ActiveRecord::Base.connection.table_exists?(:test)
-      ActiveRecord::Base.connection.create_table :test do |t| # force: true
-        t.jsonb :data
-      end
-    end
-  end
-
-  c.after(:all) do
-    DatabaseCleaner.clean
-  end
+  c.before(:all) { DatabaseCleaner.start }
+  c.after(:all) { DatabaseCleaner.clean }
 end
 
 require 'shoulda-matchers'
@@ -88,3 +73,5 @@ Shoulda::Matchers.configure do |c|
 end
 
 require_relative './helpers.rb'
+require_relative './helpers/database.rb'
+require_relative './helpers/models.rb'

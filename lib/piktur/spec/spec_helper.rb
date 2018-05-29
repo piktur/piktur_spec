@@ -4,18 +4,17 @@
 ENV['RAILS_ENV'] = ENV['RACK_ENV'] = 'test'
 
 require 'rspec/mocks'
-require 'pry'
-
-RSpec::Expectations.configuration.on_potential_false_positives = :nothing
 
 RSpec.configure do |c|
   c.color_mode = :on
 
   # Override `filter_run_including` when all filtered
   c.run_all_when_everything_filtered = true
+  # c.filter_run :focus
 
   c.expect_with :rspec do |expectations|
     expectations.include_chain_clauses_in_custom_matcher_descriptions = true
+    expectations.on_potential_false_positives = :nothing
   end
 
   c.mock_with :rspec do |mocks|
@@ -43,6 +42,23 @@ RSpec.configure do |c|
 
   c.order = :defined
   # Kernel.srand c.seed
+end
+
+require_relative '../spec.rb'
+require_relative './config.rb'
+require_relative './ext.rb'
+
+RSpec.extend Piktur::Spec::Ext
+
+Piktur::Spec::Config.configure do |c|
+  c.dirs = {
+    'piktur_core'   => 'Engine',
+    'piktur_api'    => 'API::Application',
+    'piktur_admin'  => 'Admin::Application',
+    'piktur_client' => 'Client::Application'
+  }
+  c.support = ['piktur_core']
+  c.support << Rails.application.railtie_name if defined?(Rails)
 end
 
 require_relative './helpers.rb'

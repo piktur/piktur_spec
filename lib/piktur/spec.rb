@@ -33,7 +33,7 @@ module Piktur
     # @note In order to accurately assess coverage `SimpleCov.start` **must** be called **before
     #   application loaded**
     # @see https://github.com/colszowka/simplecov/issues/16#issuecomment-113091244 simplecov#16
-    def self.init_coverage_reporting!(&block)
+    def self.init_coverage_reporting!(rails: false, &block)
       return unless ENV['COVERAGE']
       require 'simplecov'
 
@@ -44,7 +44,11 @@ module Piktur
         ::SimpleCov.coverage_dir(dir)
       end
 
-      ::SimpleCov.start('rails', &block)
+      if rails
+        ::SimpleCov.start('rails', &block)
+      else
+        ::SimpleCov.start(&block)
+      end
     end
 
   end

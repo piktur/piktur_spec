@@ -57,8 +57,7 @@ Piktur::Spec::Config.configure do |c|
     'piktur_admin'  => 'Admin::Application',
     'piktur_client' => 'Client::Application'
   }
-  c.support = ['piktur_core']
-  c.support << Rails.application.railtie_name if defined?(Rails)
+  c.support = ['piktur_core', *(defined?(Rails) ? Rails.application.railtie_name : nil)]
 end
 
 require_relative './helpers.rb'

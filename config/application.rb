@@ -12,10 +12,11 @@ module Piktur::Spec
 
   class Application < ::Rails::Application
 
-    secrets.secret_token    = ENV.fetch('SECRET_TOKEN') { SecureRandom.hex(64) }
-    secrets.secret_key_base = ENV.fetch('SECRET_KEY_BASE') { SecureRandom.hex(64) }
-    config.cache_classes    = Rails.env.production?
-    config.eager_load       = Rails.env.production?
+    secrets.secret_token    = ::ENV.fetch('SECRET_TOKEN') { ::SecureRandom.hex(64) }
+    secrets.secret_key_base = ::ENV.fetch('SECRET_KEY_BASE') { ::SecureRandom.hex(64) }
+    config.cache_classes    = ::Piktur.env.production?
+    config.eager_load       = ::Piktur.env.production?
+    config.log_level        = ::Piktur.env.test? ? :error : :debug
 
     initializer 'piktur.spec.finisher_hook',
                 after: :set_clear_dependencies_hook,

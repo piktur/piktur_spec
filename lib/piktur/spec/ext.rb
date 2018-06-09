@@ -29,13 +29,41 @@ module Piktur
       # @param [String] paths relative path of support file(s) to require
       # @param [String] app limit search to current `app` directory
       # @return [Boolean]
-      def require_support(*paths, app: ::Rails.application.railtie_name)
-        app = Pathname.pwd.basename.to_s if app['spec']
+      def require_support(*paths, app: nil) # ::Rails.application.railtie_name
+        app = Pathname.pwd.basename.to_s if app.nil? || app['spec']
         ::Piktur::Spec::Config.support[app]
           .grep(::Regexp.union(paths))
           .each { |f| require_relative Pathname.pwd.join(f) }
       end
       alias require_shared_examples require_support
+
+      # Set a debugger entry point if actual behaviour is other than expected.
+      #
+      # @example
+      #   describe '#some_method_call' do
+      #     it 'should equal one' do
+      #       actual   = subject.some_method_call
+      #       expected = 1
+      #
+      #       RSpec.debug(binding, actual != expected) # opens a pry session at this point
+      #
+      #       expect(actual).to eq(expected)
+      #     end
+      #   end
+      #
+      # @param [Object] object The object to debug, typically a `Binding`.
+      # @param [Object] diff The condition
+      # @param [Hash] options
+      #
+      # @!option [String] options :warning
+      # @!option [Exception] options :error
+      #
+      # @see Piktur.debug
+      #
+      # @return [void]
+      def debug(object, diff = true, **options)
+        ::Piktur.debug(object, diff, options)
+      end
 
     end
 

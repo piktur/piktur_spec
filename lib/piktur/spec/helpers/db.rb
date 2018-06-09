@@ -8,7 +8,7 @@ module Piktur::Spec::Helpers
   #   - {Account}
   #   - {Catalogue}
   #   - {Catalogue::Item}
-  module Database
+  module DB
 
     def database_configuration
       begin
@@ -28,18 +28,31 @@ module Piktur::Spec::Helpers
       end
     end
 
-    # unless ActiveRecord::Base.connection.table_exists?(:test)
-    #   ActiveRecord::Base.connection.create_table :test do |t| # force: true
-    #     t.jsonb :data
-    #   end
-    # end
+    ::RSpec.configuration.prepend_before(:suite) {
+      # unless ActiveRecord::Base.connection.table_exists?(:test)
+      #   ActiveRecord::Base.connection.create_table :test do |t| # force: true
+      #     t.jsonb :data
+      #   end
+      # end
 
-    # ::Object.const_set(:TestRecord, Class.new(::ApplicationRecord) {
-    #   self.table_name = 'test'
-    # })
+      ::Rails.application.load_seed if defined?(::Rails) && ::Rails.application
+    }
 
-    ::RSpec.configuration.prepend_before(:suite) { ::Rails.application.load_seed }
+  end
 
+end
+
+module Test
+
+  if defined?(::ApplicationRecord)
+    const_set(:Record, Class.new(::ApplicationRecord) {
+      self.table_name = 'test'
+    })
+  end
+
+  class Entity < ::ROM::Struct # < ::Piktur::Struct
+    ::ApplicationModel[self, :Struct]
+    attribute :id, ::Dry::Types['int']
   end
 
 end

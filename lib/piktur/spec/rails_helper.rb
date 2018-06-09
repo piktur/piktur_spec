@@ -16,7 +16,7 @@ RSpec::Expectations.configuration.on_potential_false_positives = :nothing
 #
 # `ActiveRecord::Migration.maintain_test_schema!` drops the database before each run. This is
 # rather inefficient, instead call `Rails.application.load_seed` in before hook when necessary
-# @see Piktur::Spec::Helpers::Database
+# @see Piktur::Spec::Helpers::DB
 
 RSpec.configure do |c|
   c.fixture_path = "#{::Rails.root}/spec/fixtures"
@@ -73,5 +73,5 @@ Shoulda::Matchers.configure do |c|
 end
 
 require_relative './helpers.rb'
-require_relative './helpers/database.rb'
+require_relative './helpers/db.rb'
 require_relative './helpers/models.rb'

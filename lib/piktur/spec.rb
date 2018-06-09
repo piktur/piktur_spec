@@ -13,6 +13,13 @@ module Piktur
     autoload :Config
     autoload :Helpers
 
+    # Setup gems
+    # @return [void]
+    def self.setup!
+      return unless ENV['DISABLE_SPRING']
+      Bundler.require(:default, :test, :benchmark)
+    end
+
     # @return [void]
     def self.define_test_application!
       yield if block_given?
@@ -30,10 +37,15 @@ module Piktur
     #   Piktur::Spec.init_coverage_reporting! do
     #     # define app specific configuration here
     #   end
+    #
     # @note In order to accurately assess coverage `SimpleCov.start` **must** be called **before
     #   application loaded**
+    #
     # @see https://github.com/colszowka/simplecov/issues/16#issuecomment-113091244 simplecov#16
-    def self.init_coverage_reporting!(rails: false, &block)
+    #
+    # @param [Proc] block Configure coverage
+    # @option options [Boolean] :rails (false) Start in Rails mode
+    def self.init_coverage_reporting!(rails: false, &block) # rubocop:disable MethodLength
       return unless ENV['COVERAGE']
       require 'simplecov'
 

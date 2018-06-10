@@ -50,7 +50,7 @@ module Test
     })
   end
 
-  class Entity < ::ROM::Struct # < ::Piktur::Struct
+  class Entity < ::ROM::Struct # < ::ApplicationStruct
     ::ApplicationModel[self, :Struct]
     attribute :id, ::Dry::Types['int']
   end

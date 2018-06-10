@@ -16,7 +16,7 @@ module Piktur
     # @example
     #   # Requires support file under support directory corresponding to current spec directory and
     #   # files that contain 'sharp_processor' and 'metadata' within their path.
-    #   RSpec.require_shared_examples __dir__, 'sharp_processor', 'metadata'
+    #   RSpec.require_support __dir__, 'sharp_processor', 'metadata'
     #
     # @example Define method to extract relative path from spec directory under app path
     #   def self.relative_path_from_spec_dir(path, app: self.app)

@@ -27,8 +27,9 @@ module Piktur
       setting :support, %w(piktur_core), reader: true do |input|
         {}.tap do |obj|
           input.each do |e|
-            next unless ::Gem.loaded_specs.key?(e = e.to_s)
-            obj[e] = ::Gem.loaded_specs[e].test_files
+            binding.pry
+            next unless (service = ::Piktur.services.fetch(e.to_s)) && service.gemspec
+            obj[service.name] = service.gemspec.test_files
               .select { |f| f.match?(/(spec|test)\/support/) }
           end
         end

@@ -1,5 +1,8 @@
 # frozen_string_literal: true
 
+require 'fileutils'
+require 'database_cleaner'
+
 module Piktur::Spec::Helpers
 
   # Seeds test database before request suite runs when records for the following do NOT
@@ -8,6 +11,18 @@ module Piktur::Spec::Helpers
   #   - {Account}
   #   - {Catalogue}
   #   - {Catalogue::Item}
+  #
+  # ## Database preparation
+  #
+  # `ActiveRecord::Migration.maintain_test_schema!` drops the database before each run. This is
+  # rather inefficient, instead call `Rails.application.load_seed` in before hook when necessary
+  # @see Piktur::Spec::Helpers::DB
+  #
+  # @example Check existence of residual records
+  #   ApplicationRecord.descendants.select(&:exists?).sum(&:count)
+  # @see http://www.virtuouscode.com/2012/08/31/configuring-database_cleaner-with-rails-rspec-capybara-and-selenium/ DatabaseCleaner configuration advice}
+  #
+  # @see rom-sql/spec/shared/database_setup.rb
   module DB
 
     def database_configuration
@@ -28,24 +43,77 @@ module Piktur::Spec::Helpers
       end
     end
 
-    ::RSpec.configuration.prepend_before(:suite) {
-      # unless ActiveRecord::Base.connection.table_exists?(:test)
-      #   ActiveRecord::Base.connection.create_table :test do |t| # force: true
-      #     t.jsonb :data
-      #   end
-      # end
+    # Cludge until migrations finalized and split into numbered files
+    def self.migrations_modified?
+      migrations = ::ROOT.join('config/db/migrations.rb')
+      last_run   = ::SPEC_ROOT.join('.last_run')
 
-      ::Rails.application.load_seed if defined?(::Rails) && ::Rails.application
-    }
+      ::File.mtime(migrations) > ::File.mtime(last_run)
+    end
 
   end
 
 end
 
+conn = Piktur::DB.connection
+
+RSpec.configure do |config|
+  config.prepend_before(:suite) do
+    # Piktur::DB.reset_db!
+    Piktur::DB.setup!
+
+    if DB.migrations_modified?
+      # Piktur::DB.reset_db!
+      # Piktur::DB.migrate!
+      # Piktur::DB.dump_db_schema!
+    end
+
+    DatabaseCleaner[:sequel, connection: conn].strategy = :transaction
+
+    Rails.application.load_seed if defined?(::Rails) && ::Rails.application
+  end
+
+  # @example Rollback around **each** example; misses transactions triggered within before(:all)
+  #
+  #   config.around(:each) { |example| DatabaseCleaner.cleaning { example.run } }
+  #
+  # Rollback around **each** file!
+  #
+  # Cleanup around **suite**, whilst less taxing MAY lead to conflicts ie. when using static factory
+  # data, persistence will fail on uniqueness constraints
+  #
+  # @example
+  #   c.before(:suite) { DatabaseCleaner.start }
+  #   c.after(:suite)  { DatabaseCleaner.clean }
+  config.before(:all) do
+    DatabaseCleaner[:sequel, connection: conn].start
+  end
+
+  config.after(:all) do
+    DatabaseCleaner[:sequel, connection: conn].clean
+  end
+
+  config.after(:suite) do
+    # Piktur::DB.reverse_migrations! if migrations_modified?
+    FileUtils.touch(SPEC_ROOT.join('.status'))
+  end
+
+  # The name of this setting is a bit misleading. What it really means in Rails is "run every test
+  # method within a transaction." In the context of rspec-rails, it means "run every example
+  # within a transaction."
+  #
+  # The idea is to start each example with a clean database, create whatever data is necessary for
+  # that example, and then remove that data by simply rolling back the transaction at the end of
+  # the example.
+  #
+  # Disable if using `database_cleaner`
+  config.use_transactional_fixtures = false
+end
+
 module Test
 
   if defined?(::ApplicationRecord)
-    const_set(:Record, Class.new(::ApplicationRecord) {
+    const_set(:Record, ::Class.new(::ApplicationRecord) {
       self.table_name = 'test'
     })
   end

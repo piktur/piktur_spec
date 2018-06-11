@@ -6,23 +6,11 @@ module Piktur::Spec::Helpers
 
   extend ::ActiveSupport::Autoload
 
-  autoload :JSONAPI
-  autoload :Features
   autoload :DB
+  autoload :Factories
+  autoload :Features
+  autoload :JSONAPI
   autoload :Models
-
-  module Factories
-
-    def self.extended(base)
-      base.delegate :factory_for, to: :class
-    end
-
-    # @return [Symbol]
-    def factory_for(klass)
-      ::FactoryBot.find_by_class(klass)
-    end
-
-  end
 
   def Object.safe_remove_const(constant, namespace = ::Object)
     return if constant.nil?
@@ -47,5 +35,10 @@ module Piktur::Spec::Helpers
 
 end
 
-# You may assign arbitrary constants and doubles to this constant within your test suite.
+safe_set_const :ROOT,      Pathname.pwd
+safe_set_const :SPEC_ROOT, ROOT.join('spec')
+safe_set_const :LIB,       ROOT.join('lib')
+safe_set_const :APP,       ROOT.join('app')
+
+# Assign arbitrary constants and doubles to this constant within your test suite.
 Test = Module.new

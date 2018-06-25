@@ -25,6 +25,35 @@ module Piktur::Spec::Helpers
   # @see rom-sql/spec/shared/database_setup.rb
   module DB
 
+    # Cludge until migrations finalized and split into numbered files
+    def self.migrations_modified?
+      migrations = ::ROOT.join('db/migrations.rb')
+      last_run   = ::SPEC_ROOT.join('.status')
+      last_run.exist? || ::FileUtils.touch(::SPEC_ROOT.join('.status'))
+
+      ::File.mtime(migrations) > ::File.mtime(last_run)
+    end
+
+    def run_migrations(migrations)
+      migrations.each do |migration|
+        begin
+          migration.apply(gateway.connection, :up)
+        rescue StandardError => error
+          ::Piktur.debug(binding, true, error: error)
+        end
+      end
+    end
+
+    def reverse_migrations(migrations)
+      migrations.reverse.each do |migration|
+        begin
+          migration.apply(gateway.connection, :down)
+        rescue StandardError => error
+          ::Piktur.debug(binding, true, error: error)
+        end
+      end
+    end
+
     def database_configuration
       begin
         ::Rails.configuration.database_configuration
@@ -43,29 +72,22 @@ module Piktur::Spec::Helpers
       end
     end
 
-    # Cludge until migrations finalized and split into numbered files
-    def self.migrations_modified?
-      migrations = ::ROOT.join('config/db/migrations.rb')
-      last_run   = ::SPEC_ROOT.join('.last_run')
-
-      ::File.mtime(migrations) > ::File.mtime(last_run)
-    end
+    extend self
 
   end
 
 end
 
 conn = Piktur::DB.connection
+fn = Piktur::Spec::Helpers::DB
 
 RSpec.configure do |config|
   config.prepend_before(:suite) do
-    # Piktur::DB.reset_db!
-    Piktur::DB.setup!
+    Piktur::DB.to_prepare
 
-    if DB.migrations_modified?
-      # Piktur::DB.reset_db!
-      # Piktur::DB.migrate!
-      # Piktur::DB.dump_db_schema!
+    if Piktur::Spec::Helpers::DB.migrations_modified?
+      # fn.reset_db!
+      fn.run_migrations()
     end
 
     DatabaseCleaner[:sequel, connection: conn].strategy = :transaction

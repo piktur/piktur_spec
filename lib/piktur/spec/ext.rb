@@ -27,13 +27,15 @@ module Piktur
     module Ext
 
       # @param [String] paths relative path of support file(s) to require
-      # @param [String] app limit search to current `app` directory
+      # @param [String] app limit search to the given service or, if nil, the current `app`
+      #   directory.
+      #
       # @return [Boolean]
       def require_support(*paths, app: nil) # ::Rails.application.railtie_name
-        app = Pathname.pwd.basename.to_s if app.nil? || app['spec']
+        app = Pathname.pwd.basename.to_s if app.nil? || app.index('spec')
         ::Piktur::Spec::Config.support[app]
           .grep(::Regexp.union(paths))
-          .each { |f| require_relative Pathname.pwd.join(f) }
+          .each { |f| require_relative ::Pathname.pwd.join(f) }
       end
       alias require_shared_examples require_support
 

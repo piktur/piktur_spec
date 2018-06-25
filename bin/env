@@ -3,6 +3,6 @@
 
 begin
   load Gem.bin_path('piktur', 'env')
-rescue Gem::GemNotFoundException
+rescue Gem::Exception
   load File.join(ENV.fetch('PIKTUR_HOME'), 'piktur/bin/env')
 end

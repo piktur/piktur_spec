@@ -50,16 +50,6 @@ require_relative './ext.rb'
 
 RSpec.extend Piktur::Spec::Ext
 
-Piktur::Spec::Config.configure do |c|
-  c.dirs = {
-    'piktur_core'   => 'Engine',
-    'piktur_api'    => 'API::Application',
-    'piktur_admin'  => 'Admin::Application',
-    'piktur_client' => 'Client::Application'
-  }
-  c.support = ['piktur_core', *(defined?(Rails) ? Rails.application&.railtie_name : nil)]
-end
-
 Piktur::Spec.setup!
 
 require 'pry'
@@ -70,7 +60,7 @@ RSpec.configure do |c|
   c.extend Piktur::Spec::Helpers::Features, type: :feature
 
   # Setup/teardown test namespace for arbitrary constant definitions
-  c.before(:suite) { Object.safe_set_const(:Test, Module.new) }
+  c.before(:suite) { Object.safe_const_set(:Test, Module.new) }
   c.after(:suite) { Object.safe_remove_const(:Test) }
 end
 

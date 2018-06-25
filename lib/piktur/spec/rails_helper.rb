@@ -35,4 +35,4 @@ Shoulda::Matchers.configure do |c|
 end
 
 require_relative './helpers.rb'
-%w(db models factories).each { require_relative "./helpers/#{f}.rb" }
+%w(db models factories).each { |f| require_relative "./helpers/#{f}.rb" }

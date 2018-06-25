@@ -10,29 +10,50 @@ module Piktur
 
       extend ::Dry::Configurable
 
-      # @!method spec_dirs
-      #   @return [Hash{Symbol=>Pathname}]
-      setting :dirs, {}, { reader: true } do |input|
-        {}.tap do |obj|
-          input.each do |k, v|
-            next unless (railtie = Support::Inflector.constantize(v, ::Piktur))
-            obj[k] = railtie.root.join('spec')
-          end
-        end
-      end
+      # @return [Regexp]
+      SUPPORT_MATCHER = /(spec|test)\/support/
 
-      # @!method support
-      #   Returns a list of spec support files within given gem directories
-      #   @return [Array<String>]
-      setting :support, %w(piktur_core), reader: true do |input|
-        {}.tap do |obj|
-          input.each do |e|
-            binding.pry
-            next unless (service = ::Piktur.services.fetch(e.to_s)) && service.gemspec
-            obj[service.name] = service.gemspec.test_files
-              .select { |f| f.match?(/(spec|test)\/support/) }
-          end
+      # @!attribute [rw] support
+      #   Returns a hash keyed by service name listing support files provided by the service.
+      #   @see .support_files
+      setting(:support, %w(piktur), reader: true) { |services| support_files(services) }
+
+      class << self
+
+        # @example
+        #   configure { |config| config.dirs = { 'piktur_api' => 'API::Application' } }
+        #
+        # @return [Hash{String=>Pathname}] A hash of `Pathname`s keyed by the service name.
+        def spec_directories
+          h = {}
+          Services.specs.each { |name, spec| h[name] = Pathname(spec.gem_dir).join('spec') }
+          h
         end
+        alias dirs spec_directories
+
+        # @param [Array<String>] services
+        #
+        # @return [Hash{String=>Array<String>}]
+        def support_files(services)
+          h = {}
+          services.each { |service| h[service] = provided_by(service) }
+          h
+        end
+
+        private
+
+          # @param [String] name
+          #
+          # @return [Array<String>] A list of files
+          def provided_by(name)
+            return unless (gemspec = gemspec(name))
+            gemspec.test_files.select { |f| f.match?(SUPPORT_MATCHER) }
+          end
+
+          def gemspec(name)
+            Services.specs[name]
+          end
+
       end
 
     end

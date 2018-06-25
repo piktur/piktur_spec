@@ -12,6 +12,12 @@ module Piktur
     autoload :Ext
     autoload :Config
     autoload :Helpers
+    autoload :Manifest
+
+    # @return [void]
+    def self.configure(&config)
+      Piktur::Spec::Config.configure(&config)
+    end
 
     # Setup gems
     # @return [void]

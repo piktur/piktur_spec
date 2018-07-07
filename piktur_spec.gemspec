@@ -16,8 +16,6 @@ Gem::Specification.new do |s|
   s.files       = Dir[
     '{bin,config,lib}/**/*.rb',
     'Gemfile',
-    'Gemfile.common',
-    'Gemfile.dummy',
     'piktur_spec.gemspec',
     base: __dir__
   ]

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require 'active_support/dependencies/autoload'
-require 'piktur/support/constants'
+require 'piktur/constants'
 
 module Piktur::Spec::Helpers
 

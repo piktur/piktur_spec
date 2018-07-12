@@ -11,7 +11,7 @@ module Piktur
     # @example model Asset::Subclass requires shared example
     #   with 'spec defined at spec/models/asset/subclass'
     #     when 'a matching directory structure exists under spec/support'
-    #       'RSpec.required_shared_examples('piktur_core', 'models/asset')'
+    #       'RSpec.required_shared_examples('piktur_core', 'concepts/asset')'
     #         should load 'support/models/asset/shared_examples.rb'
     # @example
     #   # Requires support file under support directory corresponding to current spec directory and

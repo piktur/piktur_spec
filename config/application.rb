@@ -20,9 +20,7 @@ module Piktur
       config.eager_load       = ::Piktur.env.production?
       config.log_level        = ::Piktur.env.test? ? :error : :debug
 
-      initializer 'piktur.spec.finisher_hook',
-                  after: :set_clear_dependencies_hook,
-                  group: :all do
+      initializer 'piktur.spec.finisher_hook', after: :finisher_hook, group: :all do
         # Perform final setup after absolute last in `Dummy::Application.initializers_chain`
       end
 

@@ -23,16 +23,5 @@ RSpec.configure do |c|
   c.include Piktur::Spec::Helpers::Features, type: :feature
 end
 
-require 'shoulda-matchers'
-
-Shoulda::Matchers.configure do |c|
-  c.integrate do |with|
-    # Choose a test framework:
-    with.test_framework :rspec
-
-    with.library :rails
-  end
-end
-
 require_relative './helpers.rb'
 %w(db models factories).each { |f| require_relative "./helpers/#{f}.rb" }

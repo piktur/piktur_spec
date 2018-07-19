@@ -19,6 +19,11 @@ module Piktur
       Piktur::Spec::Config.configure(&config)
     end
 
+    # @return [Dry::Configurable::Class]
+    def self.config
+      Piktur::Spec::Config.config
+    end
+
     # Setup gems
     # @return [void]
     def self.setup!

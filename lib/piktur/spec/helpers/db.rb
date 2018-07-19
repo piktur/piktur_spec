@@ -83,16 +83,18 @@ fn = Piktur::Spec::Helpers::DB
 
 RSpec.configure do |config|
   config.prepend_before(:suite) do
-    Piktur::DB.to_prepare
+    unless Rails.application.initialized?
+      Piktur::DB.send(:to_prepare)
 
-    if Piktur::Spec::Helpers::DB.migrations_modified?
-      # fn.reset_db!
-      fn.run_migrations()
+      if Piktur::Spec::Helpers::DB.migrations_modified?
+        # fn.reset_db!
+        fn.run_migrations()
+      end
+
+      DatabaseCleaner[:sequel, connection: conn].strategy = :transaction
+
+      Rails.application.load_seed if defined?(::Rails) && ::Rails.application
     end
-
-    DatabaseCleaner[:sequel, connection: conn].strategy = :transaction
-
-    Rails.application.load_seed if defined?(::Rails) && ::Rails.application
   end
 
   # @example Rollback around **each** example; misses transactions triggered within before(:all)
@@ -140,9 +142,8 @@ module Test
     })
   end
 
-  class Entity < ::ROM::Struct # < ::ApplicationStruct
-    ::ApplicationModel[self, :Struct]
-    attribute :id, ::Dry::Types['int']
+  class Entity < ::ApplicationStruct
+    attribute(:id, 'int')
   end
 
 end

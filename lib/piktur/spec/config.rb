@@ -47,7 +47,9 @@ module Piktur
           # @return [Array<String>] A list of files
           def provided_by(name)
             return unless (gemspec = gemspec(name))
-            gemspec.test_files.select { |f| f.match?(SUPPORT_MATCHER) }
+            gemspec.test_files
+              .select { |f| f.match?(SUPPORT_MATCHER) }
+              .map { |f| ::File.expand_path(f, gemspec.gem_dir) }
           end
 
           def gemspec(name)

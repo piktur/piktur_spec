@@ -33,9 +33,10 @@ module Piktur
       # @return [Boolean]
       def require_support(*paths, app: nil) # ::Rails.application.railtie_name
         app = Pathname.pwd.basename.to_s if app.nil? || app.index('spec')
-        ::Piktur::Spec::Config.support[app]
-          .grep(::Regexp.union(paths))
-          .each { |f| require_relative ::Pathname.pwd.join(f) }
+
+        ::Piktur::Spec.config.support[app]
+          .select { |f| f.match? ::Regexp.union(paths) }
+          .each { |f| require_relative f }
       end
       alias require_shared_examples require_support
 

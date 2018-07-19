@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 require 'securerandom'
+
 require_relative './container.rb'
-require 'piktur/security'
 
 module Piktur::Spec::Helpers
 
@@ -12,22 +12,31 @@ module Piktur::Spec::Helpers
       ::Piktur::Security::Config.jwt.create_config
     end
 
-    def Token(opts) # rubocop:disable MethodName
-      ::Piktur::Security::JWT::Token.new(**opts)
+    def generate_jwt(opts)
+      issuer.call(**opts)
     end
 
-    def Proxy(name, role)
+    # @param (see Piktur::UserProxy)
+    def Proxy(type, role)
       require 'piktur/security/entity/user_proxy'
-      ::Piktur::UserProxy[name, role]
+
+      ::Piktur::UserProxy[type, role]
     end
 
   end
 
 end
 
-Piktur::Security.install
+require 'piktur/core'
+require 'piktur/security'
 
 RSpec.configure do |config|
-  config.before(:all) { require 'piktur/security/authorization/roles' }
+  config.before(:all) do
+    Piktur::Security.install unless
+      defined?(Rails) && Rails.application&.initialized?
+  end
+
   config.include Piktur::Spec::Helpers::Security
+
+  let(:issuer) { ::Piktur::Security::JWT::Issuer.new(issuer: 'https://api.piktur.io') }
 end

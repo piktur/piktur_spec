@@ -27,9 +27,13 @@ RSpec.shared_examples 'a container' do |container|
     subject { container }
 
     it { should respond_to(:[]) }
+
     it { should respond_to(:register) }
+
     it { should respond_to(:resolve) }
+
     it { should respond_to(:namespace) }
+
     it { should be_a(::Dry::Container::Mixin) }
   end
 end
@@ -49,4 +53,3 @@ end
 RSpec.configure do |config|
   config.include Piktur::Spec::Helpers::Container
 end
-

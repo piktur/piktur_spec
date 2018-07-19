@@ -18,6 +18,7 @@ module Piktur
       secrets.secret_key_base = ::ENV.fetch('SECRET_KEY_BASE') { ::SecureRandom.hex(64) }
       config.cache_classes    = ::Piktur.env.production?
       config.eager_load       = ::Piktur.env.production?
+      config.logger           = ::Piktur.logger
       config.log_level        = ::Piktur.env.test? ? :error : :debug
 
       initializer 'piktur.spec.finisher_hook', after: :finisher_hook, group: :all do

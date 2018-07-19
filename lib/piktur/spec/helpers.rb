@@ -13,6 +13,7 @@ module Piktur::Spec::Helpers
   autoload :Factories
   autoload :Features
   autoload :Files
+  autoload :Inheritance
   autoload :JSONAPI
   autoload :Models
   autoload :Security

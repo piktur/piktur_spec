@@ -58,8 +58,8 @@ module Piktur
       # @param [Object] diff The condition
       # @param [Hash] options
       #
-      # @!option [String] options :warning
-      # @!option [Exception] options :error
+      # @option [String] options :warning
+      # @option [Exception] options :error
       #
       # @see Piktur.debug
       #

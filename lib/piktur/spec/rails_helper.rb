@@ -5,7 +5,7 @@ require_relative './spec_helper'
 require_relative File.join(Object.const_get(:APP_ROOT), 'config/environment.rb')
 
 # Prevent database truncation if the environment is production
-abort('The Rails environment is running in production mode!') if Piktur.env.production?
+abort('The Rails environment is running in production mode!') if Rails.env.production?
 
 require 'rspec/rails'
 # Add additional requires below this line. Rails is not loaded until this point!
@@ -24,4 +24,3 @@ RSpec.configure do |c|
 end
 
 require_relative './helpers.rb'
-%w(db models factories).each { |f| require_relative "./helpers/#{f}.rb" }

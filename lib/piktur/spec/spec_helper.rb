@@ -63,4 +63,3 @@ RSpec.configure do |c|
   c.before(:suite) { Object.safe_const_set(:Test, Module.new) }
   c.after(:suite) { Object.safe_remove_const(:Test) }
 end
-

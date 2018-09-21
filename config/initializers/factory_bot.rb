@@ -3,6 +3,7 @@
 unless Piktur.env.production?
   require 'faker'
   require 'factory_bot_rails'
+  require 'rom/factory' if defined?(ROM)
 
   # Find factory by `klass` and return `#name`
   #

@@ -1,6 +1,14 @@
 #!/usr/bin/env ruby
 # frozen_string_literal: true
 
-APP_PATH ||= File.expand_path('../config/application', __dir__)
-require_relative APP_PATH
+begin
+  load File.expand_path('./env', __dir__)
+  load File.expand_path('./spring', __dir__) unless defined?(Spring)
+rescue LoadError => err
+  raise unless err.message.include?('spring')
+end
+
+require_relative File.expand_path('config/boot.rb', APP_ROOT)
+
+# @see railties-5.1.0/lib/rails/engine/commands.rb
 require 'rails/commands'

@@ -2,6 +2,8 @@
 
 require 'piktur'
 
+Object.safe_const_set :SPEC_ROOT, File.expand_path('spec', Dir.pwd)
+
 module Piktur
 
   # @see file:README.markdown

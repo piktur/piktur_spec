@@ -8,7 +8,6 @@ module Piktur::Spec::Helpers
       models
       policies
       repositories
-      schemas
       transactions
     )
 

@@ -16,8 +16,12 @@ module Piktur
     # Minimal Rails application, used to mount and boot an engine and for testing.
     class Application < ::Rails::Application
 
-      secrets.secret_token    = ::ENV.fetch('SECRET_TOKEN') { ::SecureRandom.hex(64) }
+      secrets.secret_token = ::ENV.fetch('SECRET_TOKEN') { ::SecureRandom.hex(64) }
       secrets.secret_key_base = ::ENV.fetch('SECRET_KEY_BASE') { ::SecureRandom.hex(64) }
+      config.cache_classes = ::Piktur.env.production?
+      config.eager_load = ::Piktur.env.production?
+      config.logger = ::Piktur.logger
+      config.log_level = ::Piktur.env.test? ? :error : :debug
 
       # @note Ensure actual paths added ie. `Rails::Application#require_environment`
       paths.keys.each do |path|

@@ -8,15 +8,10 @@ module Piktur
 
     class Config
 
-      extend ::Dry::Configurable
+      extend ::Piktur::Configurable
 
       # @return [Regexp]
       SUPPORT_MATCHER = /(spec|test)\/support/
-
-      # @!attribute [rw] support
-      #   Returns a hash keyed by service name listing support files provided by the service.
-      #   @see .support_files
-      setting(:support, %w(piktur), reader: true) { |services| support_files(services) }
 
       class << self
 
@@ -57,6 +52,15 @@ module Piktur
           end
 
       end
+
+      default = %w(piktur)
+      # @!attribute [rw] support
+      #   Returns a hash keyed by service name listing support files provided by the service.
+      #   @see .support_files
+      #   @return [Hash{}]
+      setting :support, default, reader: true, &Types.Constructor(Hash, &method(:support_files))
+        .default { type[default] }
+        .method(:call)
 
     end
 

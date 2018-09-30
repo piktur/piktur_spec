@@ -8,53 +8,42 @@ module Piktur::Spec
   #   # spec/manifest.rb
   #   require 'piktur/spec/manifest'
   #
-  #   module Run
+  #   module Manifest
   #     include Piktur::Spec::Manifest
   #
-  #     MODELS = ['a', 'b']
+  #     MODELS = ['a_spec.rb', 'b_spec.rb']
   #     FOCUS  = ['component/a', 'feature/z']
   #   end
   #
-  #   Run.models
-  #   Run.focus
-  #
-  #   $ rspec spec/manifest.rb -f progress
+  #   Manifest.models # => ['a_spec.rb', 'b_spec.rb']
+  #   Manifest.focus(pattern: '**/application_*') # => ['spec/unit/application_model_spec.rb']
   module Manifest
 
-    # if Piktur.services
-    #   ::Piktur.services.paths.each do |path|
-    #     path = File.join(path, 'spec')
-    #     $LOAD_PATH << path if File.exist?(path)
-    #   end
-    # end
+    # @return [String]
+    PATTERN  = 'spec/%s{,/*,/**/*}_spec.rb'
 
-    PATTERN  = 'spec/%s/{*,**/*}_spec.rb'
-
-    # POLICIES = Set.new
-    # PENDING  = Set.new
-    # FEATURES = Set.new
-    # FOCUS    = Set.new
-
-    def call(specs_to_run)
-      specs_to_run.each { |path| load(path) if File.exist?(path) }
-    end
-
-    def specs_to_run(specs: nil, root: Dir.pwd, glob: PATTERN)
-      specs ||= safe_const_get(__callee__.upcase)
-      specs ||= ::Dir[format(glob, __callee__), base: root]
-
-      call(specs)
+    def call(root: ::Dir.pwd, pattern: nil)
+      safe_const_get(__callee__.upcase) ||
+        ::Dir[format(PATTERN, (pattern || __callee__)), base: root]
     end
 
     %i(
+      api
+      assets
+      cache
+      concepts
+      db
       features
       focus
-      assets
-      controllers
+      integration
+      loader
       models
+      pending
       policies
-      routing
-    ).each { |type| alias_method type, :specs_to_run }
+      security
+      support
+      system
+    ).each { |type| alias_method type, :call }
 
   end
 

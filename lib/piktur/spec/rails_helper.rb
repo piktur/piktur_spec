@@ -2,13 +2,14 @@
 
 require_relative './spec_helper'
 
-require_relative File.join(Object.const_get(:APP_ROOT), 'config/environment.rb')
+# Initialize the Rails application
+require_relative File.expand_path('./config/environment.rb', APP_ROOT)
 
 # Prevent database truncation if the environment is production
 abort('The Rails environment is running in production mode!') if Rails.env.production?
 
 require 'rspec/rails'
-# Add additional requires below this line. Rails is not loaded until this point!
+# Add additional requires below this line.
 
 RSpec::Expectations.configuration.on_potential_false_positives = :nothing
 

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 # Ensure correct environment set
-ENV['RAILS_ENV'] = ENV['RACK_ENV'] = 'test'
+ENV['ENV'] = ENV['RAILS_ENV'] = ENV['RACK_ENV'] = 'test'
 
 require 'rspec/mocks'
 
@@ -44,22 +44,15 @@ RSpec.configure do |c|
   # Kernel.srand c.seed
 end
 
-require_relative '../spec.rb'
-require_relative './config.rb'
-require_relative './ext.rb'
+%w(../spec config ext).each { |f| require_relative "#{f}.rb" }
 
 RSpec.extend Piktur::Spec::Ext
 
-Piktur::Spec.setup!
-
-require 'pry'
-
 require_relative './helpers.rb'
+
+# Assign arbitrary constants and doubles to this constant within your test suite.
+Object.safe_const_set(:Test, Module.new)
 
 RSpec.configure do |c|
   c.extend Piktur::Spec::Helpers::Features, type: :feature
-
-  # Setup/teardown test namespace for arbitrary constant definitions
-  c.before(:suite) { Object.safe_const_set(:Test, Module.new) }
-  c.after(:suite) { Object.safe_remove_const(:Test) }
 end

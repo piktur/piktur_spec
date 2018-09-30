@@ -43,16 +43,16 @@ module Piktur
     end
 
     # @return [void]
-    def self.define_test_application!
+    def self.define_rails_application!
       yield if block_given?
-      load File.expand_path('../../config/application.rb', __dir__)
+      require_relative ::File.expand_path('../../config/application.rb', __dir__)
     end
 
     # Initializes the Rails application defined at config/application.rb
     # @return [void]
-    def self.init_test_application!
+    def self.init_rails_application!
       yield if block_given?
-      load File.expand_path('../../config/environment.rb', __dir__)
+      require_relative ::File.expand_path('../../config/environment.rb', __dir__)
     end
 
     # @example

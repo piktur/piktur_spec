@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require 'active_support/dependencies'
 require 'piktur'
 
 Object.safe_const_set :SPEC_ROOT, File.expand_path('spec', Dir.pwd)

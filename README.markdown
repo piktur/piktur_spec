@@ -40,7 +40,7 @@ Utilise the test application as follows.
   # frozen_string_literal: true
 
   require 'piktur/spec'
-  Piktur::Spec.define_test_application!
+  Piktur::Spec.define_rails_application!
 
   # OR
 
@@ -50,7 +50,7 @@ Utilise the test application as follows.
   # frozen_string_literal: true
 
   require 'piktur/spec'
-  Piktur::Spec.init_test_application!
+  Piktur::Spec.init_rails_application!
 
   # OR
 
@@ -65,8 +65,8 @@ Ensure `/bin/rspec` exists and is executable `chmod +x ./bin/rspec`. If not add 
   # frozen_string_literal: true
 
   begin
-    load Gem.bin_path('piktur', 'rspec')
+    load Gem.bin_path('piktur', 'test')
   rescue Gem::Exception
-    load File.join(ENV.fetch('PIKTUR_HOME'), 'piktur/bin/rspec')
+    load File.join(ENV.fetch('PIKTUR_HOME'), 'piktur/bin/test')
   end
 ```

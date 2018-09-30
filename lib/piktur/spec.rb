@@ -11,8 +11,9 @@ module Piktur
 
     extend ::ActiveSupport::Autoload
 
-    autoload :Ext
     autoload :Config
+    autoload :Ext
+    autoload :Factories
     autoload :Helpers
     autoload :Manifest
 

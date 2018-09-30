@@ -67,7 +67,7 @@ module Piktur
     #
     # @param [Proc] block Configure coverage
     # @option options [Boolean] :rails (false) Start in Rails mode
-    def self.init_coverage_reporting!(rails: false, &block) # rubocop:disable MethodLength
+    def self.init_coverage_reporting!(rails: false, &block)
       return unless ENV['COVERAGE']
       require 'simplecov'
 
@@ -78,11 +78,7 @@ module Piktur
         ::SimpleCov.coverage_dir(dir)
       end
 
-      if rails
-        ::SimpleCov.start('rails', &block)
-      else
-        ::SimpleCov.start(&block)
-      end
+      ::SimpleCov.start(*(rails ? 'rails' : nil), &block)
     end
 
   end

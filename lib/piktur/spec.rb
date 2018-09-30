@@ -27,19 +27,12 @@ module Piktur
 
     # @return [void]
     def self.configure(&config)
-      Piktur::Spec::Config.configure(&config)
+      Config.configure(&config)
     end
 
     # @return [Dry::Configurable::Class]
     def self.config
-      Piktur::Spec::Config.config
-    end
-
-    # Setup gems
-    # @return [void]
-    def self.setup!
-      return unless ENV['DISABLE_SPRING']
-      Bundler.require(:default, :test, :benchmark)
+      Config.config
     end
 
     # @return [void]
@@ -82,9 +75,5 @@ module Piktur
     end
 
   end
-
-  # @!method spec
-  #   @see Piktur::Spec::Config
-  Config.setting :spec, Spec::Config, reader: true
 
 end

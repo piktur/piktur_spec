@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# Load the Rails application.
+# Load the Piktur::Spec::Application
 require_relative './application.rb'
 
 # Initialize the Rails application.

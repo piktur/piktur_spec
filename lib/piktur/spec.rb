@@ -16,6 +16,15 @@ module Piktur
     autoload :Helpers
     autoload :Manifest
 
+    # @return [String]
+    def self.status
+      path = ::File.expand_path('.status', ::SPEC_ROOT)
+      ::File.exist?(path) || ::FileUtils.touch(path)
+      path
+    end
+
+    def self.last_run; ::File.mtime(status); end
+
     # @return [void]
     def self.configure(&config)
       Piktur::Spec::Config.configure(&config)

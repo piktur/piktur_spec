@@ -8,8 +8,8 @@ module Piktur::Spec::Helpers
       require 'capybara'
       require 'capybara/rspec'
       require 'capybara/rails' if defined?(::Rails) && ::Rails.application
-    rescue LoadError => e
-
+    rescue ::LoadError => err
+      ::Piktur.logger.error(err.message)
     end
 
   end

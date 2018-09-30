@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require_relative './boot.rb'
+
 %w(
   rails
   action_controller/railtie

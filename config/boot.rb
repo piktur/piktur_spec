@@ -1,5 +1,9 @@
 # frozen_string_literal: true
 
-ENV['BUNDLE_GEMFILE'] ||= File.expand_path('Gemfile', Dir.pwd)
+begin
+  load Gem.bin_path('piktur', 'env')
+rescue Gem::Exception
+  load File.expand_path('piktur/bin/env', ENV.fetch('PIKTUR_HOME'))
+end
 
 require 'bundler/setup'

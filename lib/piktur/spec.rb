@@ -16,6 +16,23 @@ module Piktur
     autoload :Helpers
     autoload :Manifest
 
+    # Configure and/or load a subset of application namespaces under test
+    #
+    # @return [void]
+    def self.env(&block)
+      ::Piktur.logger.info <<~MSG
+        Overload this method with behaviour necessary to setup a test environment without
+        initializing the Rails application.
+
+        ```
+          # example_spec.rb
+          Piktur::Spec.env do
+            load(paths: %w(users profiles), index: true)
+          end
+        ```
+      MSG
+    end
+
     # @return [String]
     def self.status
       path = ::File.expand_path('.status', ::SPEC_ROOT)

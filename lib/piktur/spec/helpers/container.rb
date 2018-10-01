@@ -9,23 +9,34 @@ module Piktur::Spec::Helpers
 
     module_function
 
-    # @param [Module] namespace
-    # @return [Object] the container instance
-    def containerize(namespace, stub: true)
-      namespace.singleton_class.send(:attr_accessor, :container) unless
-        namespace.singleton_class.respond_to?(:container)
-
-      namespace.container = Dry::Container.new.tap { |obj| obj.enable_stubs! if stub }
+    def reset_container!(container = :container, namespace: ::Piktur, stub: true)
+      namespace.send("#{container}=".to_sym, nil)
+      namespace.send(container).tap { |obj| stub && obj.enable_stubs! }
     end
 
   end
 
 end
 
-RSpec.shared_examples 'a container' do |container|
-  describe '.container' do
-    subject { container }
+RSpec.shared_context 'container' do
+  include Piktur::Spec::Helpers::Container
 
+  let(:container) { reset_container!(__method__, stub: true) }
+  let(:types) { reset_container!(__method__, stub: true) }
+  let(:test_container) do
+    ::Test.safe_const_set(:Container, ::Class.new {
+      include ::Dry::Container::Mixin
+      include ::Piktur::Support::Container::Mixin
+    })
+
+    ::Test::Container.new.enable_stubs!
+  end
+
+  after(:all) { ::Test.safe_remove_const(:Container) }
+end
+
+RSpec.shared_examples 'a container' do
+  describe '.container' do
     it { should respond_to(:[]) }
 
     it { should respond_to(:register) }
@@ -36,20 +47,4 @@ RSpec.shared_examples 'a container' do |container|
 
     it { should be_a(::Dry::Container::Mixin) }
   end
-end
-
-RSpec.shared_context 'stub container' do |namespace|
-  before(:context) do
-    ::Test.safe_const_reset(:Container, ::Class.new { include ::Dry::Container::Mixin })
-    ::Test.safe_const_reset(:ContainerInstance, ::Test::Container.new.enable_stubs!)
-    containerize(namespace, stub: true)
-  end
-
-  before do
-    # allow(namespace).to receive(:container).and_return(::Test::ContainerInstance)
-  end
-end
-
-RSpec.configure do |config|
-  config.include Piktur::Spec::Helpers::Container
 end

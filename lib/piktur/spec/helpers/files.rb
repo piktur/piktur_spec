@@ -2,14 +2,7 @@
 
 module Piktur::Spec::Helpers
 
-  module Files
-
-    COMPONENT_TYPES = %i(
-      models
-      policies
-      repositories
-      transactions
-    )
+  module Loader
 
     def one; Inflector.singularize(type) + '.rb'; end
 

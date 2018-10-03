@@ -54,5 +54,6 @@ require_relative './helpers.rb'
 Object.safe_const_set(:Test, Module.new)
 
 RSpec.configure do |c|
+  c.extend Piktur::Spec::Helpers
   c.extend Piktur::Spec::Helpers::Features, type: :feature
 end

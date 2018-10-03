@@ -35,6 +35,11 @@ module Piktur
           h
         end
 
+        # @return [String] The absolute path to the custom helpers file
+        def custom_helpers_path(path)
+          ::File.expand_path(path, ::Dir.pwd)
+        end
+
         private
 
           # @param [String] name
@@ -52,6 +57,15 @@ module Piktur
           end
 
       end
+
+      default = 'lib/piktur/spec/helpers.rb'
+      # @!attribute [rw] helpers
+      #   Returns the custom helpers path. Helpers defined at this path will be available to
+      #   all specs.
+      #   @return [String]
+      setting :helpers, default, reader: true, &Types['string'].constructor(&method(:custom_helpers_path))
+        .default { type[default] }
+        .method(:call)
 
       default = %w(piktur)
       # @!attribute [rw] support

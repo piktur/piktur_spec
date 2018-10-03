@@ -21,7 +21,7 @@ module Piktur
     # Configure and/or load a subset of application namespaces under test
     #
     # @return [void]
-    def self.env(&block)
+    module_function def env(&block)
       ::Piktur.logger.info <<~MSG
         Overload this method with behaviour necessary to setup a test environment without
         initializing the Rails application.

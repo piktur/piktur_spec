@@ -2,6 +2,7 @@
 
 require 'dry/container'
 require 'dry/container/stub'
+require 'piktur/support/container'
 
 module Piktur::Spec::Helpers
 
@@ -14,37 +15,34 @@ module Piktur::Spec::Helpers
       namespace.send(container).tap { |obj| stub && obj.enable_stubs! }
     end
 
+    def container(container = __callee__, namespace: ::Piktur, stub: false, &block)
+      ivar = "@__#{__callee__}".to_sym
+      setter = "#{__callee__}=".to_sym
+
+      # save state
+      instance_variable_set(ivar, namespace.send(__callee__))
+
+      container = namespace.send(__callee__).clone(freeze: false)
+      container = container.enable_stubs! if stub
+
+      yield(container) if block_given?
+
+      # restore previous state
+      namespace.send(setter, instance_variable_get(ivar))
+    end
+
+    # @return [String]
+    def to_key(input)
+      ::Piktur::Support::Container::Key(
+        case input
+        when ::Array then input
+        when ::Module then ::Inflector.underscore(input.name).split('/')
+        when ::String then input.split(/(?:::|\/)/)
+        else input
+        end
+      )
+    end
+
   end
 
-end
-
-RSpec.shared_context 'container' do
-  include Piktur::Spec::Helpers::Container
-
-  let(:container) { reset_container!(__method__, stub: true) }
-  let(:types) { reset_container!(__method__, stub: true) }
-  let(:test_container) do
-    ::Test.safe_const_set(:Container, ::Class.new {
-      include ::Dry::Container::Mixin
-      include ::Piktur::Support::Container::Mixin
-    })
-
-    ::Test::Container.new.enable_stubs!
-  end
-
-  after(:all) { ::Test.safe_remove_const(:Container) }
-end
-
-RSpec.shared_examples 'a container' do
-  describe '.container' do
-    it { should respond_to(:[]) }
-
-    it { should respond_to(:register) }
-
-    it { should respond_to(:resolve) }
-
-    it { should respond_to(:namespace) }
-
-    it { should be_a(::Dry::Container::Mixin) }
-  end
 end

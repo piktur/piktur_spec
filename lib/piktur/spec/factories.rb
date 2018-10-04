@@ -9,55 +9,68 @@ module Piktur
       class << self
 
         # @param [ROM::Container] env
-        def call(env)
-          return if env.nil?
+        def call(*args)
+          return if ::Piktur.env.production?
+
           ::Piktur.load_initializer('factories')
-          load!(env)
+          load!(*args)
         end
 
         private
 
-          def load!(env)
-            return if ::Piktur.env.production?
-
-            rom(env) if defined?(::ROM::Factory)
+          def load!(*args)
             factory_bot if defined?(::FactoryBot)
+            rom_factory(*args) if defined?(::ROM::Factory)
 
             true
           rescue ::ArgumentError, ::LoadError => err
             ::Piktur.logger.error(err.message)
           end
 
-          def rom(env)
+          def rom_factory(env = ::Piktur::DB.container, load: false)
+            return unless env && load
+
             ::Object.safe_const_reset(
               :Factory,
               ::ROM::Factory.configure { |config| config.rom = env }.struct_namespace(::Object)
             )
 
-            find_paths do |path, railtie|
-              path = path.join('rom')
-
-              path.exist? && path.find do |path|
-                next if path.directory?
-                ::Kernel.load path
-              rescue ::ROM::ElementNotFoundError => err
-                # @todo Likely due to DB.config reset before constants cleared. In this case
-                # the ROM container will not contain the corresponding relation.
-                ::Piktur.logger.error(err.message)
-              ensure
-                next
-              end
+            find_rom_factory_paths.each do |path|
+              ::Kernel.load(path)
+            rescue ::ROM::ElementNotFoundError => err
+              # @note Factory registration will fail unless corresponding ROM::Relation defined.
+              #   This may occur if DB.config and DB.container reset before full constant reload
+              #   DB.container is not able to re-register relations.
+              ::Piktur.logger.error(err.message)
             end
           end
 
           def factory_bot
+            find_factory_bot_paths
+
+            # FactoryBot::Railtie loads definitions within after_initialize callbacks
+            ::FactoryBot.find_definitions unless ::Piktur.rails?
+          end
+
+          def find_rom_factory_paths
+            paths = []
+
+            find_paths do |path, railtie|
+              (path = path.join('rom')).exist? && path.find do |path|
+                next if path.directory?
+                paths << path
+              end
+            end
+
+            paths
+          end
+
+          def find_factory_bot_paths
             ::FactoryBot.definition_file_paths.clear
 
             find_paths do |path|
               ::FactoryBot.definition_file_paths << path.join('factory_bot')
             end
-
-            ::FactoryBot.find_definitions unless ::Piktur.rails?
           end
 
           def find_paths

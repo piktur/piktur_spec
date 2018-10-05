@@ -2,7 +2,7 @@
 # frozen_string_literal: true
 
 begin
-  load Gem.bin_path('piktur', 'env')
+  load Gem.bin_path('piktur', 'pik-env')
 rescue Gem::Exception
-  load File.join(ENV.fetch('PIKTUR_HOME'), 'piktur/bin/env')
+  load File.expand_path('piktur/bin/pik-env', ENV.fetch('PIKTUR_HOME'))
 end

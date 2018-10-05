@@ -10,7 +10,7 @@ source ENV['GEM_SOURCE']
 
 ruby ENV.fetch('RUBY_VERSION').sub('ruby-', '')
 
-gemspec
-
 gem 'piktur',                   git:     "#{bb}/piktur/piktur.git",
                                 branch:  'master'
+
+gemspec

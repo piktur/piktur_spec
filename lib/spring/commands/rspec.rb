@@ -24,7 +24,10 @@ module Spring
       def call
         ::RSpec.configuration.start_time = ::Time.zone.now if
           defined?(::RSpec.configuration.start_time)
-        load ::Gem.bin_path(gem_name, exec_name)
+
+        load ::File.expand_path('bin/rspec', ::Dir.pwd)
+      rescue ::LoadErorr => err
+        puts "#{err.message}\nRun `bundle binstubs respec-core` to generate the bin stub."
       end
 
     end

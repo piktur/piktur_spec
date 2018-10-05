@@ -26,7 +26,7 @@ module Spring
           defined?(::RSpec.configuration.start_time)
 
         load ::File.expand_path('bin/rspec', ::Dir.pwd)
-      rescue ::LoadErorr => err
+      rescue ::LoadError => err
         puts "#{err.message}\nRun `bundle binstubs respec-core` to generate the bin stub."
       end
 

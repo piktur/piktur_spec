@@ -2,4 +2,8 @@
 
 load File.expand_path('bin/env', Dir.pwd)
 
-require 'bundler/setup'
+begin
+  require 'bundler/setup'
+rescue LoadError
+  puts 'You must `gem install bundler` and run `bundle install`'
+end

@@ -15,21 +15,14 @@ module Piktur::Spec
   #   end
   #
   #   Manifest.models # => ['a_spec.rb', 'b_spec.rb']
-  #   Manifest.focus(pattern: '**/application_*') # => ['spec/unit/application_model_spec.rb']
   #
   module Manifest
-
-    # @return [String]
-    PATTERN  = 'spec/%s{,/*,/**/*}_spec.rb'
 
     def self.extended(base)
       base.constants.each { |group| alias_method group.downcase, :call }
     end
 
-    def call(root: ::Dir.pwd, pattern: nil)
-      safe_const_get(__callee__.upcase) ||
-        ::Dir[format(PATTERN, (pattern || __callee__)), base: root]
-    end
+    def call; safe_const_get(__callee__.upcase); end
 
   end
 

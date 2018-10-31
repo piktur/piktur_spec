@@ -15,20 +15,13 @@ module Piktur::Spec::Helpers
       namespace.send(container).tap { |obj| stub && obj.enable_stubs! }
     end
 
-    def container(container = __callee__, namespace: ::Piktur, stub: false, &block)
-      ivar = "@__#{__callee__}".to_sym
-      setter = "#{__callee__}=".to_sym
+    # @return [Dry::Container] if guard false, the container instance
+    # @return [nil] if guard true
+    def container(container = __callee__, namespace: ::Piktur, guard: true, stub: false, &block)
+      return guard(__callee__, namespace, stub, &block) if guard
 
-      # save state
-      instance_variable_set(ivar, namespace.send(__callee__))
-
-      container = namespace.send(__callee__).clone(freeze: false)
-      container = container.enable_stubs! if stub
-
-      yield(container) if block_given?
-
-      # restore previous state
-      namespace.send(setter, instance_variable_get(ivar))
+      yield(namespace.send(__callee__)) if block_given?
+      namespace.send(__callee__)
     end
 
     # @return [String]
@@ -41,6 +34,28 @@ module Piktur::Spec::Helpers
         else input
         end
       )
+    end
+
+    private def guard(method, namespace, stub = false, &block)
+      return unless block_given?
+
+      ivar = "@__#{method}".to_sym
+      setter = "#{method}=".to_sym
+
+      # save state
+      instance_variable_set(ivar, namespace.send(method))
+
+      yield(
+        namespace.send(method)
+          .clone(freeze: false)
+          .tap { |copy| stub && copy.enable_stubs! }
+      )
+
+      # restore previous state
+      namespace.send(setter, instance_variable_get(ivar))
+      remove_instance_variable(ivar)
+
+      nil
     end
 
   end

@@ -5,6 +5,7 @@ require_relative './boot.rb'
 %w(
   rails
   action_controller/railtie
+  action_mailer/railtie
 ).each { |f| require f }
 
 Bundler.require(*Rails.groups)

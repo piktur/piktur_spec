@@ -16,11 +16,11 @@ module Piktur
           load!(*args)
         end
 
-        private
+        protected
 
-          def load!(*args)
-            factory_bot if defined?(::FactoryBot)
-            rom_factory(*args) if defined?(::ROM::Factory)
+          def load!(*args, factory_bot: false, rom_factory: false, **options)
+            self.factory_bot if defined?(::FactoryBot) && factory_bot
+            self.rom_factory(*args, options) if defined?(::ROM::Factory) && rom_factory
 
             true
           rescue ::ArgumentError, ::LoadError => err

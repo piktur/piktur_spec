@@ -23,6 +23,22 @@ module Piktur
       config.logger = ::Piktur.logger
       config.log_level = ::Piktur.env.test? ? :error : :debug
 
+      config.generators do |g|
+        g.system_tests = nil
+        # g.template_engine     :slim
+        g.integration_tool    :rspec
+        g.test_framework      :rspec, fixture: true
+        g.fixture_replacement :factory_bot, dir: 'spec/factories/factory_bot'
+        g.request_specs       false
+        g.view_specs          false
+        g.helper_specs        false
+        g.controller_specs    false
+        g.routing_specs       false
+        g.helper              false
+        g.stylesheets         false
+        g.javascripts         false
+      end
+
       # @note Ensure actual paths added ie. `Rails::Application#require_environment`
       paths.keys.each do |path|
         relative = ::File.join('spec', 'dummy', path)

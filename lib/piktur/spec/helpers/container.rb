@@ -17,26 +17,45 @@ module Piktur::Spec::Helpers
 
     # @return [Dry::Container] if guard false, the container instance
     # @return [nil] if guard true
-    def container(container = __callee__, namespace: ::Piktur, guard: true, stub: false, &block)
-      return guard(__callee__, namespace, stub, &block) if guard
+    def container(
+      container = __callee__,
+      namespace: ::Piktur,
+      guard: true,
+      stub: false,
+      replace: false,
+      &block
+    )
+      return _replace(__callee__, namespace, stub, &block) if replace
+      return _guard(__callee__, namespace, stub, &block) if guard
 
       yield(namespace.send(__callee__)) if block_given?
       namespace.send(__callee__)
     end
 
     # @return [String]
-    def to_key(input)
-      ::Piktur::Support::Container::Key(
-        case input
-        when ::Array then input
-        when ::Module then ::Inflector.underscore(input.name).split('/')
-        when ::String then input.split(/(?:::|\/)/)
-        else input
-        end
-      )
+    def to_key(input, namespace_separator = '.')
+      if input.is_a?(::Array)
+        input.map { |e| to_key(e) }.join(namespace_separator)
+      else
+        ::Piktur::Support::Container::Key.format(input, namespace_separator)
+      end
     end
 
-    private def guard(method, namespace, stub = false, &block)
+    # Temporarily replace the container returned from `method`
+    #
+    # @return [void]
+    private def _replace(method, namespace, *args)
+      _guard(method, namespace, *args) do |container|
+        namespace.instance_variable_set("@#{method}".to_sym, container)
+
+        yield(container) if block_given?
+      end
+    end
+
+    # @yield A temporary copy of the container to the block
+    #
+    # @return [void]
+    private def _guard(method, namespace, stub = false, &block)
       return unless block_given?
 
       ivar = "@__#{method}".to_sym

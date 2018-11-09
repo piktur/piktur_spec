@@ -65,8 +65,8 @@ Ensure `/bin/rspec` exists and is executable `chmod +x ./bin/rspec`. If not add 
   # frozen_string_literal: true
 
   begin
-    load Gem.bin_path('piktur', 'pik-test')
+    load Gem.bin_path('piktur', 'piktur')
   rescue Gem::Exception
-    load File.expand_path('piktur/bin/pik-test', ENV.fetch('PIKTUR_HOME'))
+    load File.expand_path('piktur/bin/test', ENV.fetch('PIKTUR_HOME'))
   end
 ```

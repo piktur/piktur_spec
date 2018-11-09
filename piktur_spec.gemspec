@@ -14,7 +14,8 @@ Gem::Specification.new do |s|
   s.description = 'Minimal testing environment for Piktur gems'
   s.license     = ''
   s.files       = Dir[
-    '{bin,config,lib}/**/*.rb',
+    'bin/*',
+    '{config,lib}/**/*.rb',
     'Gemfile',
     'piktur_spec.gemspec',
     base: __dir__

@@ -2,7 +2,7 @@
 
 require 'dry/container'
 require 'dry/container/stub'
-require 'piktur/support/container'
+require 'piktur/container'
 
 module Piktur::Spec::Helpers
 
@@ -10,43 +10,35 @@ module Piktur::Spec::Helpers
 
     module_function
 
-    def reset_container!(container = :container, namespace: ::Piktur, stub: true)
-      namespace.send("#{container}=".to_sym, nil)
-      namespace.send(container).tap { |obj| stub && obj.enable_stubs! }
+    # @return [Piktur::Container::Aggregate]
+    def __container__
+      ::Piktur.__container__
+    end
+
+    # @return [void]
+    def reset_container!(stub: true)
+      ::Piktur::Container.reset! do |aggregate|
+        aggregate.each { |container| stub && container.enable_stubs! }
+      end
     end
 
     # @return [Dry::Container] if guard false, the container instance
     # @return [nil] if guard true
-    def container(
-      container = __callee__,
-      namespace: ::Piktur,
-      guard: true,
-      stub: false,
-      replace: false,
-      &block
-    )
-      return _replace(__callee__, namespace, stub, &block) if replace
-      return _guard(__callee__, namespace, stub, &block) if guard
+    def container(guard: true, stub: false, replace: false, &block)
+      return _replace(__callee__, stub, &block) if replace
+      return _guard(__callee__, stub, &block) if guard
 
-      yield(namespace.send(__callee__)) if block_given?
-      namespace.send(__callee__)
-    end
+      yield(__container__) if block_given?
 
-    # @return [String]
-    def to_key(input, namespace_separator = '.')
-      if input.is_a?(::Array)
-        input.map { |e| to_key(e) }.join(namespace_separator)
-      else
-        ::Piktur::Support::Container::Key.format(input, namespace_separator)
-      end
+      __container__.__send__(__callee__)
     end
 
     # Temporarily replace the container returned from `method`
     #
     # @return [void]
-    private def _replace(method, namespace, *args)
-      _guard(method, namespace, *args) do |container|
-        namespace.instance_variable_set("@#{method}".to_sym, container)
+    private_class_method def _replace(name, *args)
+      _guard(name, *args) do |container|
+        __container__.__send__("#{name}=".to_sym, container)
 
         yield(container) if block_given?
       end
@@ -55,23 +47,22 @@ module Piktur::Spec::Helpers
     # @yield A temporary copy of the container to the block
     #
     # @return [void]
-    private def _guard(method, namespace, stub = false, &block)
+    private_class_method def _guard(name, stub = false, &block)
       return unless block_given?
 
-      ivar = "@__#{method}".to_sym
-      setter = "#{method}=".to_sym
+      ivar = "@__#{name}".to_sym
 
       # save state
-      instance_variable_set(ivar, namespace.send(method))
+      instance_variable_set(ivar, __container__.__send__(name))
 
       yield(
-        namespace.send(method)
+        __container__.__send__(name)
           .clone(freeze: false)
           .tap { |copy| stub && copy.enable_stubs! }
       )
 
       # restore previous state
-      namespace.send(setter, instance_variable_get(ivar))
+      __container__.__send__("#{name}=".to_sym, instance_variable_get(ivar))
       remove_instance_variable(ivar)
 
       nil
